@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Inspection Lite</title>
+</head>
+<body>
+  <h1>Add a Company</h1>
+
+  <form id="companyForm">
+    <input name="name" placeholder="Company Name" required />
+    <input name="city" placeholder="City" required />
+    <button type="submit">Save Company</button>
+  </form>
+
+  <h2>Companies</h2>
+  <ul id="companyList"></ul>
+
+  <script>
+    // Fetch and display existing companies
+    async function loadCompanies() {
+      const res = await fetch('/api/companies');
+      const companies = await res.json();
+      const list = document.getElementById('companyList');
+      list.innerHTML = '';
+      companies.forEach(c => {
+        const li = document.createElement('li');
+        li.textContent = `${c.name} (${c.city})`;
+        list.appendChild(li);
+      });
+    }
+
+    // Submit form
+    document.getElementById('companyForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const form = new FormData(e.target);
+      const data = Object.fromEntries(form.entries());
+      await fetch('/api/companies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      e.target.reset();
+      loadCompanies();
+    };
+
+    // Load companies on page load
+    loadCompanies();
+  </script>
+</body>
